@@ -3,22 +3,22 @@
         <template #header>
             <div class="card-header">
                 <span>ASIN管理</span>
-                <el-tag type="info" size="small">最多3个</el-tag>
+                <el-tag class="asin-tag-info" type="info" size="default">最多3个</el-tag>
             </div>
         </template>
 
         <div class="asin-tags">
-            <el-tag v-for="(asin, index) in dynamicTags" :key="asin" closable @close="handleRemoveAsin(index)"
-                class="asin-tag">
+            <el-tag v-for="(asin, index) in store.asins" :key="asin" closable @close="handleRemoveAsin(index)"
+                class="asin-tag" size="large">
                 {{ asin }}
             </el-tag>
 
-            <el-input v-if="inputVisible" ref="inputRef" v-model="inputValue" class="asin-input" size="small"
+            <el-input v-if="inputVisible" ref="inputRef" v-model="inputValue" class="asin-input" size="default"
                 @keyup.enter="handleInputConfirm" @blur="handleInputConfirm" placeholder="输入ASIN (B0xxxxxxxx)"
                 :class="{ 'input-error': inputError }" />
 
-            <el-button v-else class="button-new-tag" size="small" @click="showInput"
-                :disabled="dynamicTags.length >= 3">
+            <el-button v-else class="button-new-tag" size="default" @click="showInput"
+                :disabled="store.asins.length >= 3">
                 + 添加ASIN
             </el-button>
         </div>
@@ -43,7 +43,7 @@ const asinRegex = /^B0[A-Z0-9]{8}$/
 
 // 方法
 const handleRemoveAsin = (index: number) => {
-    dynamicTags.value.splice(index, 1)
+    store.removeAsin(index)
     ElMessage.success('ASIN删除成功')
 }
 
@@ -63,8 +63,31 @@ const handleInputConfirm = () => {
         if (!asinRegex.test(value)) {
             inputError.value = true
             ElMessage.error('ASIN格式不正确！应为B0开头的10位字符')
+            // 出现错误时，重新聚焦
             inputRef.value?.focus()
             return
+        }
+
+        // 重复asin校验
+        if (store.asins.includes(value)) {
+            inputError.value = true
+            ElMessage.error('ASIN已存在！')
+            inputRef.value?.focus()
+            return
+        }
+
+        // 数量校验
+        if (store.asins.length >= 3) {
+            inputError.value = true
+            ElMessage.error('最多只能添加3个ASIN！')
+            inputRef.value?.focus()
+            return
+        }
+        // 添加ASIN
+        if (store.addAsin(value)) {
+            ElMessage.success('ASIN添加成功')
+        } else {
+            ElMessage.error('添加ASIN失败')
         }
     }
 
@@ -75,10 +98,24 @@ const handleInputConfirm = () => {
 </script>
 
 <style scoped>
+.el-card :deep(.el-card__header) {
+    padding: 12px;
+}
+
+.el-card :deep(.el-card__body) {
+    padding: 12px;
+}
+
 .card-header {
+    font-size: 16px;
+    font-weight: bold;
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.card-header .asin-tag-info {
+    font-size: 13px;
 }
 
 .asin-tags {
