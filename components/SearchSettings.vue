@@ -5,14 +5,14 @@
         </template>
 
         <el-row :gutter="24" align="middle">
-            <el-col :span="14">
+            <el-col :span="16">
                 <el-form-item class="el-form-item" label="最大页数(最多前5页):">
-                    <el-input-number v-model="store.maxPages" :min="1" :max="5" size="small"
+                    <el-input-number v-model="store.maxPages" :min="1" :max="5" size="default"
                         @change="handleMaxPagesChange" />
                 </el-form-item>
             </el-col>
-            <el-col :span="10">
-                <el-button size="small" @click="handleClearCache">
+            <el-col :span="8">
+                <el-button size="default" type="danger" @click="handleClearCache">
                     <el-icon>
                         <Delete />
                     </el-icon>
@@ -52,8 +52,18 @@ const handleClearCache = async () => {
 </script>
 
 <style scoped>
+.el-card {
+    border-radius: 12px;
+}
+
+.search-section {
+    margin-bottom: 10px;
+}
+
 :deep(.el-form-item) {
     margin-bottom: 0;
+    font-size: 14px;
+    font-weight: 540;
 }
 
 .el-card :deep(.el-card__header) {
@@ -63,11 +73,9 @@ const handleClearCache = async () => {
 .el-card :deep(.el-card__body) {
     padding: 12px;
 }
+
 .el-card__header span {
     font-size: 16px;
     font-weight: bold;
-}
-.el-form-item {
-    font-size: 14px;
 }
 </style>
