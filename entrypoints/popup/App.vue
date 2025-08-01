@@ -12,7 +12,7 @@
             <!-- 批量处理区域 -->
             <BatchProcessor />
             <!-- 状态显示 -->
-            <el-alert class="status-alert" />
+            <!-- <el-alert class="status-alert" /> -->
         </el-main>
     </div>
 </template>
@@ -21,6 +21,7 @@
 import { onMounted } from 'vue'
 import { useExtensionStore } from '@/stores/useExtensionStore'
 import AsinManager from '@/components/AsinManager.vue'
+import SearchSettings from '@/components/SearchSettings.vue'
 const store = useExtensionStore()
 
 // 初始化

@@ -32,6 +32,17 @@ export const useExtensionStore = defineStore('extension', () => {
         return false
     }
 
+    // 设置最大搜索页
+    const setMaxPages = (pages: number) => {
+        maxPages.value = pages
+        // saveToStorage()
+    }
+
+    // 清除缓存
+    const clearStorage = async () => {
+        await chrome.storage.local.clear()                                      
+    }
+
     return {
         // 状态
         asins,
@@ -39,6 +50,8 @@ export const useExtensionStore = defineStore('extension', () => {
         keywords,
         // 方法
         removeAsin,
-        addAsin
+        addAsin,
+        setMaxPages,
+        clearStorage,
     }
 })
