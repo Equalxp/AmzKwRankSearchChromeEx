@@ -18,7 +18,7 @@
                 :class="{ 'input-error': inputError }" />
 
             <el-button v-else class="button-new-tag" size="default" @click="showInput"
-                :disabled="store.asins.length >= 3">
+                :disabled="store.asins.length >= 3" type="primary" plain>
                 + 添加ASIN
             </el-button>
         </div>
@@ -98,6 +98,12 @@ const handleInputConfirm = () => {
 </script>
 
 <style scoped>
+.el-card {
+    border-radius: 12px;
+}
+.asin-section {
+    margin-bottom: 10px;
+}
 .el-card :deep(.el-card__header) {
     padding: 12px;
 }
