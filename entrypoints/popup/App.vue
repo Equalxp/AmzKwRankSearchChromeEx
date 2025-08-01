@@ -9,8 +9,8 @@
             <AsinManager />
             <!-- 搜索设置区域 -->
             <SearchSettings />
-            <!-- 批量处理区域 -->
-            <BatchProcessor />
+            <!-- 下载处理区域 -->
+            <DownloadProcessor />
             <!-- 状态显示 -->
             <!-- <el-alert class="status-alert" /> -->
         </el-main>
@@ -22,6 +22,7 @@ import { onMounted } from 'vue'
 import { useExtensionStore } from '@/stores/useExtensionStore'
 import AsinManager from '@/components/AsinManager.vue'
 import SearchSettings from '@/components/SearchSettings.vue'
+import DownloadProcessor from '@/components/DownloadProcessor.vue'
 const store = useExtensionStore()
 
 // 初始化
@@ -31,17 +32,19 @@ onMounted(async () => {
 
 <style scoped>
 .amazon-keyword-extension {
-    width: 500px;
+    width: 460px;
     min-height: 600px;
 }
 
 .header {
+    width: calc(100% - 16px);
     height: auto;
     text-align: center;
     background: linear-gradient(135deg, #a2ceff 0%, #409EFF 100%);
     color: #FFFFFF;
     padding: 10px 0px;
     border-radius: 12px;
+    margin: 0 auto
 }
 
 .header h2 {
@@ -50,7 +53,7 @@ onMounted(async () => {
 }
 
 .main-content {
-    padding: 15px;
+    padding: 8px;
 }
 
 .status-alert {
