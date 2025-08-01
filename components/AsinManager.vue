@@ -17,8 +17,8 @@
                 @keyup.enter="handleInputConfirm" @blur="handleInputConfirm" placeholder="输入ASIN (B0xxxxxxxx)"
                 :class="{ 'input-error': inputError }" />
 
-            <el-button v-else class="button-new-tag" size="default" @click="showInput"
-                :disabled="store.asins.length >= 3" type="primary" plain>
+            <el-button v-else class="button-new-tag" size="default" @click="showInput" v-show="addAsinIsVisible"
+                type="primary" plain>
                 + 添加ASIN
             </el-button>
         </div>
@@ -26,6 +26,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { ref, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useExtensionStore } from '@/stores/useExtensionStore'
@@ -38,6 +39,10 @@ const inputValue = ref('')
 const inputRef = ref()
 const inputError = ref(false)
 const dynamicTags = ref(['Tag 1', 'Tag 2', 'Tag 3'])
+
+// 计算属性 
+const addAsinIsVisible = computed(() => store.asins.length < 3)
+
 // ASIN格式验证
 const asinRegex = /^B0[A-Z0-9]{8}$/
 
@@ -101,9 +106,11 @@ const handleInputConfirm = () => {
 .el-card {
     border-radius: 12px;
 }
+
 .asin-section {
     margin-bottom: 10px;
 }
+
 .el-card :deep(.el-card__header) {
     padding: 12px;
 }

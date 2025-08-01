@@ -4,14 +4,14 @@
             <span>搜索设置</span>
         </template>
 
-        <el-row :gutter="24" align="middle">
-            <el-col :span="16">
+        <el-row :gutter="20" align="middle">
+            <el-col :span="17">
                 <el-form-item class="el-form-item" label="最大页数(最多前5页):">
                     <el-input-number v-model="store.maxPages" :min="1" :max="5" size="default"
                         @change="handleMaxPagesChange" />
                 </el-form-item>
             </el-col>
-            <el-col :span="8">
+            <el-col :span="3">
                 <el-button size="default" type="danger" @click="handleClearCache">
                     <el-icon>
                         <Delete />
