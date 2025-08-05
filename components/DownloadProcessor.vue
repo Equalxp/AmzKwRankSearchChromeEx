@@ -64,7 +64,6 @@
                 <el-input v-model="keywordInput" type="textarea" :rows="12"
                     placeholder="请输入关键词，每行一个：&#10;例如：&#10;wireless headphones&#10;bluetooth speaker&#10;phone case&#10;..."
                     class="keyword-textarea" maxlength="10000" show-word-limit />
-
                 <div class="input-stats">
                     <span class="stats-text">
                         预计导入关键词：{{ previewKeywords.length }} 个
@@ -312,6 +311,13 @@ const handleDownloadResults = () => {
 </script>
 
 <style scoped>
+.el-card {
+    border-radius: 12px;
+}
+.card-header {
+    font-size: 16px;
+    font-weight: bold
+}
 .keywords-preview {
     margin-top: 15px;
 }
@@ -386,9 +392,25 @@ const handleDownloadResults = () => {
     padding: 0 10px;
 }
 
-:deep(.el-dialog__body) {
-    padding: 20px;
+:deep(.el-dialog__header) {
+    padding-bottom: 5px;
 }
+
+:deep(.el-dialog__body) {
+    padding: 8px;
+}
+
+.el-card :deep(.el-card__header) {
+    padding: 12px;
+}
+
+:deep(.el-textarea__inner) {
+    overflow: hidden;
+}
+
+/* :deep(.el-overlay-dialog) {
+    overflow: hidden !important;
+} */
 
 :deep(.el-alert__content) {
     line-height: 1.5;
