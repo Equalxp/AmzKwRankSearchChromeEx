@@ -33,7 +33,6 @@ onMounted(async () => {
 <style scoped>
 .amazon-keyword-extension {
     width: 460px;
-    min-height: 600px;
 }
 
 .header {
