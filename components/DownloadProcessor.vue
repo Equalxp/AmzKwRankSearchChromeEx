@@ -58,7 +58,8 @@
             </div>
         </div>
         <!-- 输入关键词对话框 -->
-        <el-dialog v-model="keywordDialogVisible" class="keyword-dialog" title="输入关键词" width="400px" :before-close="handleDialogClose">
+        <el-dialog v-model="keywordDialogVisible" class="keyword-dialog" title="输入关键词" width="400px"
+            :before-close="handleDialogClose">
             <div class="keyword-input-section">
                 <el-input v-model="keywordInput" type="textarea" :rows="12"
                     placeholder="请输入关键词，每行一个：&#10;例如：&#10;wireless headphones&#10;bluetooth speaker&#10;phone case&#10;..."
@@ -258,57 +259,35 @@ const clearInput = () => {
 
 // 批量搜索
 const handleBatchSearch = async () => {
-    //   if (!store.hasKeywords) {
-    //     ElMessage.error('请先上传关键词文件')
-    //     return
-    //   }
+    if (!store.hasKeywords) {
+        ElMessage.error('请先上传关键词文件')
+        return
+    }
 
-    //   if (store.asins.length === 0) {
-    //     ElMessage.error('请先添加至少一个ASIN')
-    //     return
-    //   }
+    if (store.asins.length === 0) {
+        ElMessage.error('请先添加至少一个ASIN')
+        return
+    }
 
-    //   store.setBatchSearching(true)
-    //   store.setStatus('正在进行批量搜索...', 'info')
+    store.setBatchSearching(true)
+    store.setStatus('正在进行批量搜索...', 'info')
 
-    //   try {
-    //     // 获取当前活动标签页
-    //     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+    try {
+        // 获取当前活动标签页
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
 
-    //     if (!tab.id) {
-    //       throw new Error('无法获取当前标签页')
-    //     }
+        if (!tab.id) {
+            throw new Error('无法获取当前标签页')
+        }
 
-    //     // 检查是否在亚马逊网站
-    //     if (!tab.url?.includes('amazon.')) {
-    //       ElMessage.error('请在亚马逊网站上使用此功能')
-    //       return
-    //     }
-
-    //     // 发送消息给content script
-    //     const response = await chrome.tabs.sendMessage(tab.id, {
-    //       action: 'batchSearch',
-    //       keywords: store.keywords,
-    //       asins: store.asins,
-    //       maxPages: store.maxPages
-    //     })
-
-    //     if (response.success) {
-    //       store.setBatchResults(response.results)
-    //       store.setStatus(`批量搜索完成，找到 ${response.results.length} 个结果`, 'success')
-    //       ElMessage.success(`批量搜索完成，找到 ${response.results.length} 个结果`)
-    //     } else {
-    //       store.setStatus(response.message || '批量搜索失败', 'error')
-    //       ElMessage.error(response.message || '批量搜索失败')
-    //     }
-    //   } catch (error) {
-    //     console.error('批量搜索错误:', error)
-    //     const errorMessage = error instanceof Error ? error.message : '批量搜索过程中发生错误'
-    //     store.setStatus(errorMessage, 'error')
-    //     ElMessage.error(errorMessage)
-    //   } finally {
-    //     store.setBatchSearching(false)
-    //   }
+        // 检查是否在亚马逊网站
+        if (!tab.url?.includes('amazon.')) {
+            ElMessage.error('请在亚马逊网站上使用此功能')
+            return
+        }
+    } catch (error) {
+    } finally {
+    }
 }
 
 // 下载搜索结果excel
