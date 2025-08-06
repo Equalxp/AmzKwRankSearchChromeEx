@@ -6,6 +6,7 @@ export default defineBackground(() => {
 
     // 监听来自content script的连接
     chrome.runtime.onConnect.addListener((port) => {
+        // 消息-1
         console.log('收到新的端口连接:', port.name)
 
         // 监听content script的消息
@@ -15,6 +16,7 @@ export default defineBackground(() => {
             if (tabId) {
                 // 存储端口连接
                 connectedPorts.set(tabId, port)
+                // 消息-2
                 console.log(`为标签页 ${tabId} 建立端口连接`)
 
                 // 监听端口断开
@@ -32,9 +34,11 @@ export default defineBackground(() => {
 
                 // 监听来自content script的消息
                 port.onMessage.addListener((message) => {
+                    // 消息-3
                     console.log(`收到来自标签页 ${tabId} 的消息:`, message)
 
                     switch (message.type) {
+                        // 消息-4
                         case 'contentScriptConnected':
                             console.log(`内容脚本已连接到标签页 ${tabId}，URL: ${message.url}`)
                             break
@@ -226,6 +230,7 @@ export default defineBackground(() => {
     // 监听标签页更新事件
     chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         if (changeInfo.status === 'complete' && tab.url?.includes('amazon.')) {
+            // 消息-5
             console.log(`标签页 ${tabId} 加载完成:`, tab.url)
 
             // 检查是否有现有连接
@@ -254,6 +259,7 @@ export default defineBackground(() => {
     // 定期清理失效连接（可选）
     setInterval(() => {
         const connectedTabIds = Array.from(connectedPorts.keys())
+        // 消息-6
         console.log(`当前活动连接数: ${connectedTabIds.length}`)
 
         // 验证每个连接的有效性

@@ -541,6 +541,7 @@ export default defineContentScript({
         chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             console.log('收到传统消息:', request)
 
+            // handleMessage中调用 batchSearch()后, 跳转页面 (location.href = …) , 当前的 content script 进程会被销毁
             handleMessage(request)
                 .then(result => {
                     try {
