@@ -164,4 +164,7 @@ const handleInputConfirm = () => {
     border-color: red !important;
     box-shadow: 0 0 5px red !important;
 }
+:deep(.el-tag__content) {
+    font-size: 14px;
+}
 </style>

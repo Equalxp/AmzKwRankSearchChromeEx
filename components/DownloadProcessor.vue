@@ -284,8 +284,30 @@ const handleBatchSearch = async () => {
             ElMessage.error('请在亚马逊网站上使用此功能')
             return
         }
+
+        // 发送消息给content script
+        const response = await chrome.tabs.sendMessage(tab.id, {
+            action: 'batchSearch',
+            keywords: store.keywords,
+            asins: store.asins,
+            maxPages: store.maxPages
+        })
+
+        if (response.success) {
+            store.setBatchResults(response.results)
+            store.setStatus(`批量搜索完成，找到 ${response.results.length} 个结果`, 'success')
+            ElMessage.success(`批量搜索完成，找到 ${response.results.length} 个结果`)
+        } else {
+            store.setStatus(response.message || '批量搜索失败', 'error')
+            ElMessage.error(response.message || '批量搜索失败')
+        }
     } catch (error) {
+        console.error('批量搜索错误:', error)
+        const errorMessage = error instanceof Error ? error.message : '批量搜索过程中发生错误'
+        store.setStatus(errorMessage, 'error')
+        ElMessage.error(errorMessage)
     } finally {
+        store.setBatchSearching(false)
     }
 }
 
@@ -314,10 +336,12 @@ const handleDownloadResults = () => {
 .el-card {
     border-radius: 12px;
 }
+
 .card-header {
     font-size: 16px;
     font-weight: bold
 }
+
 .keywords-preview {
     margin-top: 15px;
 }
@@ -402,10 +426,6 @@ const handleDownloadResults = () => {
 
 .el-card :deep(.el-card__header) {
     padding: 12px;
-}
-
-:deep(.el-textarea__inner) {
-    overflow: hidden;
 }
 
 /* :deep(.el-overlay-dialog) {
