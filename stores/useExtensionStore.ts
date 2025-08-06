@@ -10,11 +10,20 @@ export interface SearchResult {
     isAd: boolean
 }
 
+// 单个搜索结果 待优化
+export interface SingleSearchResult {
+  found: boolean
+  page?: number
+  position?: number
+  isAd?: boolean
+}
+
 export const useExtensionStore = defineStore('extension', () => {
     // 状态数据
     const asins = ref<string[]>([])
     const maxPages = ref(2) // 最大搜索页
     const keywords = ref<string[]>([]) // 关键词-数组
+    const results = ref<Record<string, SingleSearchResult>>({}) // 单个搜索结果
     const batchSearching = ref(false) //批量搜索
     const batchResults = ref<SearchResult[]>([]) // 批量搜索结果
     const statusMessage = ref('') //状态message
@@ -63,10 +72,32 @@ export const useExtensionStore = defineStore('extension', () => {
         statusType.value = type
     }
 
+    // 
+    const setBatchResults = (newBatchResults: SearchResult[]) => {
+        batchResults.value = newBatchResults
+        saveToStorage()
+    }
+
     // 关键词设置
     const setKeywords = (newKeywords: string[]) => {
         keywords.value = newKeywords
         // saveToStorage()
+    }
+
+
+    // 存储管理
+    const saveToStorage = async () => {
+        try {
+            await chrome.storage.local.set({
+                asins: asins.value,
+                maxPages: maxPages.value,
+                keywords: keywords.value,
+                results: results.value, // 单个搜索结果
+                batchResults: batchResults.value // 批量搜索结果
+            })
+        } catch (error) {
+            console.error('保存到存储失败:', error)
+        }
     }
 
     return {
@@ -74,6 +105,7 @@ export const useExtensionStore = defineStore('extension', () => {
         asins,
         maxPages,
         keywords,
+        results,
         batchSearching,
         statusMessage,
         statusType,
@@ -86,6 +118,7 @@ export const useExtensionStore = defineStore('extension', () => {
         addAsin,
         setMaxPages,
         clearStorage,
+        setBatchResults,
         setBatchSearching,
         setStatus,
         setKeywords,
