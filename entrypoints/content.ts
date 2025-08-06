@@ -178,7 +178,7 @@ export default defineContentScript({
                 try {
                     switch (request.action) {
                         case 'searchRanking':
-                            // 搜索排名 
+                            // 搜索排名 popup发来的消息
                             const searchResult = await searchRanking(request.asins, request.maxPages)
                             resolve(searchResult)
                             break
@@ -194,6 +194,7 @@ export default defineContentScript({
                             resolve({ success: true })
                             break
 
+                        // background发消息 port问题 重新连接
                         case 'forceReconnect':
                             handleForceReconnect()
                             resolve({ success: true, message: '重连已启动' })
@@ -209,6 +210,123 @@ export default defineContentScript({
             })
         }
 
+        // 样式注入
+        const STYLE = `
+        /* 容器 */
+        #tm-asin-container {
+            position: fixed;
+            top: 60px;
+            left: 0; right: 0;
+            padding: 6px 12px;
+            background: #fff;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            transition: top 0.4s ease;
+        }
+
+        /* 状态文字 */
+        #tm-asin-container span#tm-status {
+            margin-left: 12px;
+            margin-right: 12px;
+            font-size: 16px;
+            color: rgb(110, 111, 111);
+        }
+
+        /* 结果面板 */
+        #results-panel {
+            position: fixed;
+            top: 120px;
+            right: 20px;
+            width: 400px;
+            max-height: 500px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 9998;
+            overflow: hidden;
+        }
+
+        #results-panel .panel-header {
+            background: #f5f5f5;
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #results-panel .panel-content {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        #results-panel .result-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        #results-panel .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .close-btn {
+            cursor: pointer;
+            color: #999;
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+        `
+        // 注入样式
+        function injectStyles() {
+            if (document.getElementById('amazon-keyword-extension-styles')) return
+
+            const styleEl = document.createElement('style')
+            styleEl.id = 'amazon-keyword-extension-styles'
+            styleEl.textContent = STYLE
+            document.head.appendChild(styleEl)
+        }
+
+        // 创建容器
+        // 创建状态容器
+        function createStatusContainer() {
+            if (document.getElementById('tm-asin-container')) return
+
+            const container = document.createElement('div')
+            container.id = 'tm-asin-container'
+
+            const status = document.createElement('span')
+            status.id = 'tm-status'
+            status.textContent = '亚马逊关键词排名扩展已激活'
+
+            container.appendChild(status)
+            document.body.appendChild(container)
+
+            // 滚动隐藏效果
+            let ticking = false
+            let lastScrollY = window.scrollY
+
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    window.requestAnimationFrame(() => {
+                        container.style.top = window.scrollY > lastScrollY ? '0' : '55px'
+                        lastScrollY = window.scrollY
+                        ticking = false
+                    })
+                    ticking = true
+                }
+            }, { passive: true })
+        }
         // 单个搜索排名
         async function searchRanking(asins: string[], maxPagesParam: number) {
             console.log('单个搜索排名');
@@ -222,7 +340,7 @@ export default defineContentScript({
         // 跳转到搜索结果
         function jumpToResult(keyword: string, page: number) {
             console.log('跳转到搜索结果');
-            
+
         }
     },
 });

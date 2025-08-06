@@ -103,7 +103,7 @@ export default defineBackground(() => {
         })
     }
 
-    // 备用的传统消息传递方式（增强错误处理）
+    // 备用的传统消息传递方式（增强错误处理）- 兜底
     function fallbackToTraditionalMessage(tabId: number, message: any, resolve: Function, reject: Function) {
         chrome.tabs.sendMessage(tabId, message)
             .then(response => {
@@ -146,6 +146,128 @@ export default defineBackground(() => {
             return false
         }
     }
-     
+
+    // 监听来自popup的消息
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        console.log('Background收到消息:', request)
+
+        // 处理来自popup的请求
+        if (request.action && request.tabId) {
+            sendMessageToTab(request.tabId, request).then(response => {
+                console.log('消息发送成功:', response)
+                // 传到content.js执行真正的逻辑
+                sendResponse(response)
+            }).catch(error => {
+                console.error('消息发送失败:', error)
+                sendResponse(error)
+            })
+            return true
+        }
+
+        // 处理其他类型的消息
+        switch (request.action) {
+            case 'getActiveTab':
+                chrome.tabs.query({ active: true, currentWindow: true })
+                    .then(tabs => {
+                        if (tabs[0]) {
+                            const tabId = tabs[0].id || 0
+                            sendResponse({
+                                success: true,
+                                tab: tabs[0],
+                                hasConnection: connectedPorts.has(tabId),
+                                isConnected: isPortConnected(tabId)
+                            })
+                        } else {
+                            sendResponse({ success: false, message: '无法获取当前标签页' })
+                        }
+                    })
+                    .catch(error => {
+                        console.error('获取标签页失败:', error)
+                        sendResponse({ success: false, message: '获取标签页失败' })
+                    })
+                return true
+
+            case 'checkConnection':
+                const tabId = request.tabId
+                const hasConnection = connectedPorts.has(tabId)
+                const isConnected = isPortConnected(tabId)
+                sendResponse({
+                    success: true,
+                    connected: hasConnection && isConnected,
+                    hasPort: hasConnection,
+                    isActive: isConnected,
+                    message: (hasConnection && isConnected) ? '连接正常' : '未连接到内容脚本'
+                })
+                break
+
+            case 'reconnectTab':
+                // 强制重新连接指定标签页
+                const targetTabId = request.tabId
+                if (connectedPorts.has(targetTabId)) {
+                    connectedPorts.delete(targetTabId)
+                }
+
+                // 向内容脚本发送重连请求
+                chrome.tabs.sendMessage(targetTabId, { action: 'forceReconnect' })
+                    .then(() => {
+                        sendResponse({ success: true, message: '重连请求已发送' })
+                    })
+                    .catch(error => {
+                        console.error('发送重连请求失败:', error)
+                        sendResponse({ success: false, message: '发送重连请求失败' })
+                    })
+                return true
+
+            default:
+                sendResponse({ success: false, message: '未知操作' })
+        }
+    })
+
+    // 监听标签页更新事件
+    chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+        if (changeInfo.status === 'complete' && tab.url?.includes('amazon.')) {
+            console.log(`标签页 ${tabId} 加载完成:`, tab.url)
+
+            // 检查是否有现有连接
+            if (!connectedPorts.has(tabId)) {
+                console.log(`标签页 ${tabId} 没有活动连接，等待内容脚本连接`)
+            }
+        }
+
+        // 如果页面URL发生变化，清理可能失效的连接
+        if (changeInfo.url) {
+            if (connectedPorts.has(tabId)) {
+                console.log(`标签页 ${tabId} URL变化，清理旧连接`)
+                connectedPorts.delete(tabId)
+            }
+        }
+    })
+
+    // 监听标签页关闭事件 立即清理池
+    chrome.tabs.onRemoved.addListener((tabId) => {
+        if (connectedPorts.has(tabId)) {
+            console.log(`标签页 ${tabId} 已关闭，清理端口连接`)
+            connectedPorts.delete(tabId)
+        }
+    })
+
+    // 定期清理失效连接（可选）
+    setInterval(() => {
+        const connectedTabIds = Array.from(connectedPorts.keys())
+        console.log(`当前活动连接数: ${connectedTabIds.length}`)
+
+        // 验证每个连接的有效性
+        connectedTabIds.forEach(tabId => {
+            if (!isPortConnected(tabId)) {
+                console.log(`清理失效连接: 标签页 ${tabId}`)
+            }
+        })
+    }, 60000) // 每分钟检查一次
+
+    // 扩展启动时的初始化
+    console.log('Amazon Keyword Extension Background Script 初始化完成')
+
+    // 清理可能存在的旧连接
+    connectedPorts.clear()
 
 });
