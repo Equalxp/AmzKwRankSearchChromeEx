@@ -285,7 +285,7 @@ const handleBatchSearch = async () => {
             return
         }
 
-        // 发送消息给content script
+        // 发送消息给content script 一次性消息
         const response = await chrome.tabs.sendMessage(tab.id, {
             action: 'batchSearch',
             keywords: store.keywords,
