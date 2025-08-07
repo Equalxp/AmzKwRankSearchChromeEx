@@ -37,8 +37,9 @@ export default defineBackground(() => {
                     // 消息-3
                     console.log(`收到来自标签页 ${tabId} 的消息:`, message)
 
+                    // 根据message的类型执行相应的操作
                     switch (message.type) {
-                        // 消息-4
+                        // 消息-4 刚注入完毕主动打招呼, 顺便把当前 URL 带上
                         case 'contentScriptConnected':
                             console.log(`内容脚本已连接到标签页 ${tabId}，URL: ${message.url}`)
                             break
@@ -56,7 +57,7 @@ export default defineBackground(() => {
                 try {
                     port.postMessage({
                         type: 'backgroundConnected',
-                        message: '后台脚本已连接'
+                        message: '后台脚本已连接-欢迎消息'
                     })
 
                     // 检查同步错误
@@ -72,11 +73,12 @@ export default defineBackground(() => {
         }
     })
 
-    // 向特定标签页发送消息的辅助函数（增强错误处理）
+    // 向特定标签页发送消息的辅助函数（增强错误处理）  长连接，效率高、可以多次往返
     function sendMessageToTab(tabId: number, message: any): Promise<any> {
         return new Promise((resolve, reject) => {
             const port = connectedPorts.get(tabId)
 
+            // 先尝试 Port 发送消息
             if (port) {
                 // 使用端口发送消息
                 try {
@@ -107,7 +109,7 @@ export default defineBackground(() => {
         })
     }
 
-    // 备用的传统消息传递方式（增强错误处理）- 兜底
+    // 备用的传统消息传递方式（增强错误处理）- 兜底 一次性
     function fallbackToTraditionalMessage(tabId: number, message: any, resolve: Function, reject: Function) {
         chrome.tabs.sendMessage(tabId, message)
             .then(response => {
@@ -130,12 +132,12 @@ export default defineBackground(() => {
             })
     }
 
-    // 检查端口连接状态的辅助函数
+    // 检查端口连接状态的辅助函数 - 发送测试消息验证
     function isPortConnected(tabId: number): boolean {
         const port = connectedPorts.get(tabId)
         if (!port) return false
 
-        // 尝试发送一个测试消息来验证连接
+        // 发个心跳,如果抛错或 lastError,说明断了
         try {
             port.postMessage({ type: 'ping' })
             if (chrome.runtime.lastError) {
@@ -151,15 +153,15 @@ export default defineBackground(() => {
         }
     }
 
-    // 监听来自popup的消息
+    // 监听来自popup的消息 背景脚本收消息的统筹
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         console.log('Background收到消息:', request)
 
-        // 处理来自popup的请求
+        // 处理来自popup的请求, 带action且指定tabId转发给content
         if (request.action && request.tabId) {
             sendMessageToTab(request.tabId, request).then(response => {
                 console.log('消息发送成功:', response)
-                // 传到content.js执行真正的逻辑
+                // 传到content.js执行真正的逻辑，本次消息做“回信”
                 sendResponse(response)
             }).catch(error => {
                 console.error('消息发送失败:', error)
@@ -168,8 +170,9 @@ export default defineBackground(() => {
             return true
         }
 
-        // 处理其他类型的消息
+        // 后台background处理其他类型的消息
         switch (request.action) {
+            // 返回当前激活的标签页信息并告诉 Popup 是否已建立 Port。
             case 'getActiveTab':
                 chrome.tabs.query({ active: true, currentWindow: true })
                     .then(tabs => {
@@ -191,6 +194,7 @@ export default defineBackground(() => {
                     })
                 return true
 
+            // 仅检测连接状态。
             case 'checkConnection':
                 const tabId = request.tabId
                 const hasConnection = connectedPorts.has(tabId)
@@ -204,6 +208,7 @@ export default defineBackground(() => {
                 })
                 break
 
+            // 强制让内容脚本重新连接 (例如 BFCache 恢复失败时)
             case 'reconnectTab':
                 // 强制重新连接指定标签页
                 const targetTabId = request.tabId
@@ -227,8 +232,9 @@ export default defineBackground(() => {
         }
     })
 
-    // 监听标签页更新事件
+    // 监听标签页生命周-标签页更新事件
     chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+        // 页面加载完毕
         if (changeInfo.status === 'complete' && tab.url?.includes('amazon.')) {
             // 消息-5
             console.log(`标签页 ${tabId} 加载完成:`, tab.url)
@@ -248,10 +254,11 @@ export default defineBackground(() => {
         }
     })
 
-    // 监听标签页关闭事件 立即清理池
+    // 监听标签页生命周期-标签页关闭事件
     chrome.tabs.onRemoved.addListener((tabId) => {
         if (connectedPorts.has(tabId)) {
             console.log(`标签页 ${tabId} 已关闭，清理端口连接`)
+            // 标签关闭就清理池
             connectedPorts.delete(tabId)
         }
     })
