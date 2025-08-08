@@ -74,6 +74,7 @@ export default defineContentScript({
             const base = new URL(window.location.origin + '/s');
             base.searchParams.set('k', keyword);
             base.searchParams.delete('page');
+            console.log('base base base', base);
 
             for (let page = 1; page <= maxPages; page++) {
                 base.searchParams.set('page', page.toString());
@@ -229,6 +230,7 @@ export default defineContentScript({
                 for (let i = 0; i < tasks.length; i++) {
                     const { keyword, asin } = tasks[i];
                     updateStatus(`🔎 查询关键词 ${i + 1}/${tasks.length}: "${keyword}" 下 ASIN-${asin}`);
+                    console.log('keyword, asin, maxPagesParam', keyword, asin, maxPagesParam);
 
                     const result = await fetchAsinWithDelay(keyword, asin, maxPagesParam);
                     if (result) {

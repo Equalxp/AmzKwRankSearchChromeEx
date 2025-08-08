@@ -1,4 +1,6 @@
 export default defineBackground(() => {
+    // 设置侧边栏
+    browser.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
     // console.log('Amazon Keyword Extension Background Script Loaded')
 
     // // 存储活动的端口连接

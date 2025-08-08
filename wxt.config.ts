@@ -9,6 +9,7 @@ export default defineConfig({
         permissions: [
             'storage',
             'activeTab',
+            'sidePanel',
         ],
         host_permissions: [
             'https://www.amazon.com/*',
