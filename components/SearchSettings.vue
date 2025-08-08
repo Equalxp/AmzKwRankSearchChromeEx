@@ -4,22 +4,35 @@
             <span>搜索设置</span>
         </template>
 
-        <el-row :gutter="20" align="middle">
-            <el-col :span="17">
-                <el-form-item class="el-form-item" label="最大页数(最多前5页):">
-                    <el-input-number v-model="store.maxPages" :min="1" :max="5" size="default"
-                        @change="handleMaxPagesChange" />
-                </el-form-item>
-            </el-col>
-            <el-col :span="3">
-                <el-button size="default" type="danger" @click="handleClearCache">
-                    <el-icon>
-                        <Delete />
-                    </el-icon>
-                    清除缓存
-                </el-button>
-            </el-col>
-        </el-row>
+        <div>
+            <!-- 最大页数 -->
+            <el-form-item class="el-form-item" label="最大页数:">
+                <el-input-number v-model="store.maxPages" :min="1" :max="5" size="default"
+                    @change="handleMaxPagesChange" />
+            </el-form-item>
+            <!-- 超时时间 -->
+             
+            <!-- 关键词输入 -->
+
+            <!-- 关键词上传 -->
+
+            <!-- 批量搜索按钮 -->
+
+        </div>
+
+        <!-- 清除缓存、暂停搜索移动到下载处理 -->
+        <el-button size="default" type="danger" @click="handleClearCache">
+            <el-icon>
+                <Delete />
+            </el-icon>
+            清除缓存
+        </el-button>
+        <el-button size="default" type="danger" @click="handleClearCache">
+            <el-icon>
+                <Delete />
+            </el-icon>
+            暂停搜索
+        </el-button>
     </el-card>
 </template>
 

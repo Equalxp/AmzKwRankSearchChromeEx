@@ -32,8 +32,11 @@ onMounted(async () => {
 
 <style scoped>
 .amazon-keyword-extension {
-    width: 460px;
-    min-width: none;
+    width: 100%;
+    min-width: 300px;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
 }
 
 .header {
@@ -44,19 +47,48 @@ onMounted(async () => {
     color: #FFFFFF;
     padding: 10px 0px;
     border-radius: 12px;
-    margin: 0 auto
+    margin: 0 auto;
+    box-sizing: border-box;
 }
 
 .header h2 {
     margin: 0;
     font-size: 18px;
+    word-wrap: break-word;
 }
 
 .main-content {
     padding: 8px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .status-alert {
     margin-bottom: 15px;
+}
+
+/* 响应式设计 */
+@media (max-width: 400px) {
+    .amazon-keyword-extension {
+        padding: 4px;
+    }
+    
+    .header h2 {
+        font-size: 16px;
+    }
+    
+    .main-content {
+        padding: 4px;
+    }
+}
+
+@media (min-width: 600px) {
+    .amazon-keyword-extension {
+        padding: 12px;
+    }
+    
+    .main-content {
+        padding: 12px;
+    }
 }
 </style>
