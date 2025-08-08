@@ -68,7 +68,7 @@
                     <span class="stats-text">
                         预计导入关键词：{{ previewKeywords.length }} 个
                     </span>
-                    <el-button v-if="keywordInput.trim()" type="text" size="small" @click="clearInput">
+                    <el-button v-if="keywordInput.trim()" type="link" size="small" @click="clearInput">
                         清空
                     </el-button>
                 </div>
