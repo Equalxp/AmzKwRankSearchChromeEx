@@ -46,10 +46,25 @@
                         </template>
                     </el-upload>
                 </el-form-item>
+                <!-- 关键词预览 -->
+                <div v-if="store.keywords.length > 0" class="keywords-preview">
+                    <el-divider content-position="left">
+                        <span class="preview-title">已导入关键词 ({{ store.keywords.length }}个)</span>
+                    </el-divider>
+                    <div class="keywords-list">
+                        <el-tag v-for="(keyword, index) in displayKeywords" :key="index" size="small"
+                            class="keyword-tag">
+                            {{ keyword }}
+                        </el-tag>
+                        <el-tag v-if="store.keywords.length > 10" size="small" type="info">
+                            ...还有{{ store.keywords.length - 10 }}个
+                        </el-tag>
+                    </div>
+                </div>
                 <!-- 批量搜索按钮 -->
                 <el-form-item class="el-form-item">
                     <!-- 清除缓存、暂停搜索移动到下载处理 -->
-                     <el-button size="default" type="primary" @click="handleBatchSearch">
+                    <el-button size="default" type="primary" @click="handleBatchSearch">
                         <el-icon>
                             <Delete />
                         </el-icon>
@@ -82,9 +97,14 @@ import { useExtensionStore } from '@/stores/useExtensionStore'
 const store = useExtensionStore()
 const dataForm = reactive({
     maxPages: store.maxPages,       // 初始化时从 store 拿
-    timeoutPeriod: store.timeoutPeriod
+    timeoutPeriod: store.timeoutPeriod,
+    
 })
 const keywordInput = ref('')
+
+const displayKeywords = computed(() => {
+    return store.keywords.slice(0, 10)
+})
 
 
 // 方法
@@ -96,7 +116,7 @@ const handleTimeoutPeriodChange = (value: number) => {
     store.setTimeoutPeriod(value)
 }
 
-const handleBatchSearch = async () => { 
+const handleBatchSearch = async () => {
 }
 
 const handleClearCache = async () => {
@@ -164,5 +184,29 @@ const handleClearCache = async () => {
 :deep(.el-upload__tip) {
     margin-top: 1px;
     color: #a0a4ac
+}
+
+.keywords-preview {
+    margin-top: 15px;
+}
+
+.preview-title {
+    font-size: 14px;
+    color: #606266;
+}
+
+.keywords-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.keyword-tag {
+    margin: 0;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 </style>
