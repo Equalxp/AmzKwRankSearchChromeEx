@@ -40,7 +40,7 @@ onMounted(async () => {
 }
 
 .header {
-    width: calc(100% - 16px);
+    width: calc(100% - 10px);
     height: auto;
     text-align: center;
     background: linear-gradient(135deg, #a2ceff 0%, #409EFF 100%);

@@ -56,13 +56,14 @@
                     ...还有{{ store.keywords.length - 10 }}个
                 </el-tag>
             </div>
+            <el-divider content-position="left" />
         </div>
         <!-- 输入关键词对话框 -->
         <el-dialog v-model="keywordDialogVisible" class="keyword-dialog" title="输入关键词" width="400px"
             :before-close="handleDialogClose">
             <div class="keyword-input-section">
                 <el-input v-model="keywordInput" type="textarea" :rows="12"
-                    placeholder="请输入关键词，每行一个：&#10;例如：&#10;wireless headphones&#10;bluetooth speaker&#10;phone case&#10;..."
+                    placeholder="输入关键词，每行一个：&#10;例如：&#10;wireless headphones&#10;bluetooth speaker&#10;phone case&#10;..."
                     class="keyword-textarea" maxlength="10000" show-word-limit />
                 <div class="input-stats">
                     <span class="stats-text">
@@ -355,7 +356,8 @@ const handleDownloadResults = () => {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    margin-top: 8px;
+    margin-top: 14px;
+    margin-bottom: 8px;
 }
 
 .keyword-tag {
