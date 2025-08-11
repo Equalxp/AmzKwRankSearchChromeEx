@@ -12,16 +12,18 @@ export interface SearchResult {
 
 // 单个搜索结果 待优化
 export interface SingleSearchResult {
-  found: boolean
-  page?: number
-  position?: number
-  isAd?: boolean
+    found: boolean
+    page?: number
+    position?: number
+    isAd?: boolean
 }
 
 export const useExtensionStore = defineStore('extension', () => {
     // 状态数据
-    const asins = ref<string[]>([])
+    const asins = ref<string[]>([]) // asin数据
+    
     const maxPages = ref(2) // 最大搜索页
+    const timeoutPeriod = ref(10) //超时时间
     const keywords = ref<string[]>([]) // 关键词-数组
     const results = ref<Record<string, SingleSearchResult>>({}) // 单个搜索结果
     const batchSearching = ref(false) //批量搜索
@@ -29,6 +31,14 @@ export const useExtensionStore = defineStore('extension', () => {
     const statusMessage = ref('') //状态message
     const statusType = ref<'success' | 'warning' | 'error' | 'info'>('info') //状态类型
     const singleKeyword = ref<string>() // 单个搜索关键词
+
+    // 优化
+    const dataForm = reactive({
+        maxPages: 2,
+        timeoutPeriod: 10,
+        keywords: [] as string[],
+        batchResults: [] as SearchResult[],
+    });
 
     // 计算属性
     const hasKeywords = computed(() => keywords.value.length > 0) // 关键词上传校验数值
@@ -52,7 +62,13 @@ export const useExtensionStore = defineStore('extension', () => {
 
     // 设置最大搜索页
     const setMaxPages = (pages: number) => {
-        maxPages.value = pages
+        dataForm.maxPages = pages
+        // saveToStorage()
+    }
+
+    // 设置超时时间
+    const setTimeoutPeriod = (period: number) => {
+        dataForm.timeoutPeriod = period
         // saveToStorage()
     }
 
@@ -74,13 +90,13 @@ export const useExtensionStore = defineStore('extension', () => {
 
     // 
     const setBatchResults = (newBatchResults: SearchResult[]) => {
-        batchResults.value = newBatchResults
-        saveToStorage()
+        dataForm.batchResults = newBatchResults
+        // saveToStorage()
     }
 
     // 关键词设置
     const setKeywords = (newKeywords: string[]) => {
-        keywords.value = newKeywords
+        dataForm.keywords = newKeywords
         // saveToStorage()
     }
 
@@ -91,6 +107,7 @@ export const useExtensionStore = defineStore('extension', () => {
             await chrome.storage.local.set({
                 asins: asins.value,
                 maxPages: maxPages.value,
+                timeoutPeriod: timeoutPeriod.value,
                 keywords: keywords.value,
                 results: results.value, // 单个搜索结果
                 batchResults: batchResults.value // 批量搜索结果
@@ -104,6 +121,7 @@ export const useExtensionStore = defineStore('extension', () => {
         // 状态
         asins,
         maxPages,
+        timeoutPeriod,
         keywords,
         results,
         batchSearching,
@@ -117,6 +135,7 @@ export const useExtensionStore = defineStore('extension', () => {
         removeAsin,
         addAsin,
         setMaxPages,
+        setTimeoutPeriod,
         clearStorage,
         setBatchResults,
         setBatchSearching,
