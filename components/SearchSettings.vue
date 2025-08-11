@@ -8,7 +8,7 @@
             <el-form :model="dataForm" label-width="auto" label-position="left">
                 <!-- 最大页数 -->
                 <el-form-item class="el-form-item" label="最大页数">
-                    <el-input-number v-model="store.maxPages" :min="1" :max="5" size="default"
+                    <el-input-number v-model="dataForm.maxPages" :min="1" :max="5" size="default"
                         @change="handleMaxPagesChange">
                         <template #suffix>
                             <span>页</span>
@@ -17,7 +17,7 @@
                 </el-form-item>
                 <!-- 超时时间 -->
                 <el-form-item class="el-form-item" label="超时时间">
-                    <el-input-number v-model="store.timeoutPeriod" :min="10" size="default"
+                    <el-input-number v-model="dataForm.timeoutPeriod" :min="10" size="default"
                         @change="handleTimeoutPeriodChange">
                         <template #suffix>
                             <span>秒</span>
@@ -26,8 +26,8 @@
                 </el-form-item>
                 <!-- 关键词输入 -->
                 <el-form-item label="关键词输入">
-                    <el-input v-model="keywordInput" type="textarea" :rows="5"
-                        placeholder="请输入关键词，每行一个：&#10;例如：&#10;wireless headphones&#10;bluetooth speaker&#10;..."
+                    <el-input v-model="keywordInput" type="textarea" :rows="6"
+                        placeholder="输入关键词，每行一个：&#10;例如：&#10;wireless headphones&#10;bluetooth speaker&#10;..."
                         class="keyword-textarea" maxlength="10000" show-word-limit />
                 </el-form-item>
                 <!-- 关键词上传 -->
@@ -47,17 +47,17 @@
                     </el-upload>
                 </el-form-item>
                 <!-- 关键词预览 -->
-                <div v-if="store.keywords.length > 0" class="keywords-preview">
+                <div v-if="previewKeywords.length > 0" class="keywords-preview">
                     <el-divider content-position="left">
-                        <span class="preview-title">已导入关键词 ({{ store.keywords.length }}个)</span>
+                        <span class="preview-title">已导入关键词 ({{ previewKeywords.length }}个)</span>
                     </el-divider>
                     <div class="keywords-list">
-                        <el-tag v-for="(keyword, index) in displayKeywords" :key="index" size="small"
-                            class="keyword-tag">
+                        <el-tag v-for="(keyword, index) in previewKeywords.slice(0, 10)" :key="index" size="small"
+                            class="preview-tag">
                             {{ keyword }}
                         </el-tag>
-                        <el-tag v-if="store.keywords.length > 10" size="small" type="info">
-                            ...还有{{ store.keywords.length - 10 }}个
+                        <el-tag v-if="previewKeywords.length > 10" size="small" type="info">
+                            ...还有{{ previewKeywords.length - 10 }}个
                         </el-tag>
                     </div>
                 </div>
@@ -66,7 +66,7 @@
                     <!-- 清除缓存、暂停搜索移动到下载处理 -->
                     <el-button size="default" type="primary" @click="handleBatchSearch">
                         <el-icon>
-                            <Delete />
+                            <Search />
                         </el-icon>
                         批量搜索
                     </el-button>
@@ -98,14 +98,32 @@ const store = useExtensionStore()
 const dataForm = reactive({
     maxPages: store.maxPages,       // 初始化时从 store 拿
     timeoutPeriod: store.timeoutPeriod,
-    
+    keywords: store.keywords, // store中唯一一个关键词
 })
 const keywordInput = ref('')
 
+// 关键词预览
+const previewKeywords = computed(() => {
+    if (!keywordInput.value.trim()) return []
+
+    console.log('asdhbiashfiasf', keywordInput.value
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
+        .filter((keyword, index, array) => array.indexOf(keyword) === index));
+    
+
+    return keywordInput.value
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
+        .filter((keyword, index, array) => array.indexOf(keyword) === index) // 去重
+})
+
+// 计算属性-tag关键词展示list
 const displayKeywords = computed(() => {
     return store.keywords.slice(0, 10)
 })
-
 
 // 方法
 const handleMaxPagesChange = (value: number) => {
@@ -208,5 +226,13 @@ const handleClearCache = async () => {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.keywords-preview {
+    margin-top: 15px;
+}
+
+:deep(.el-divider--horizontal ) {
+    margin: 10px 0;
 }
 </style>
