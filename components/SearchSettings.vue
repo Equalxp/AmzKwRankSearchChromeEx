@@ -32,7 +32,8 @@
                 </el-form-item>
                 <!-- 关键词上传 -->
                 <el-form-item label="关键词上传">
-                    <el-upload drag multiple>
+                    <el-upload drag multiple accept=".xlsx,.xls,.csv" :show-file-list="false"
+                        :before-upload="handleBeforeUpload" @change="handleFileChange">
                         <el-icon class="el-icon--upload">
                             <upload-filled />
                         </el-icon>
@@ -92,6 +93,7 @@
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Delete } from '@element-plus/icons-vue'
 import { useExtensionStore } from '@/stores/useExtensionStore'
+import { parseExcelFile, validateExcelFile, generateResultsExcel } from '@/utils/excelUtils'
 
 // 变量
 const store = useExtensionStore()
@@ -132,6 +134,20 @@ const handleMaxPagesChange = (value: number) => {
 
 const handleTimeoutPeriodChange = (value: number) => {
     store.setTimeoutPeriod(value)
+}
+
+// 上传之前文件校验
+const handleBeforeUpload = (file: File) => {
+    const validation = validateExcelFile(file)
+        if (!validation.valid) {
+            ElMessage.error(validation.message)
+            return false
+        }
+    return true
+}
+
+const handleFileChange = async (file: any) => {
+
 }
 
 const handleBatchSearch = async () => {
