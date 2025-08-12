@@ -18,16 +18,15 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { useExtensionStore } from '@/stores/useExtensionStore'
-import AsinManager from '@/components/AsinManager.vue'
-import SearchSettings from '@/components/SearchSettings.vue'
-import DownloadProcessor from '@/components/DownloadProcessor.vue'
-const store = useExtensionStore()
+import { onMounted } from "vue";
+import { useExtensionStore } from "@/stores/useExtensionStore";
+import AsinManager from "@/components/AsinManager.vue";
+import SearchSettings from "@/components/SearchSettings.vue";
+import DownloadProcessor from "@/components/DownloadProcessor.vue";
+const store = useExtensionStore();
 
 // 初始化
-onMounted(async () => {
-})
+onMounted(async () => {});
 </script>
 
 <style scoped>
@@ -43,8 +42,8 @@ onMounted(async () => {
     width: calc(100% - 10px);
     height: auto;
     text-align: center;
-    background: linear-gradient(135deg, #a2ceff 0%, #409EFF 100%);
-    color: #FFFFFF;
+    background: linear-gradient(135deg, #a2ceff 0%, #409eff 100%);
+    color: #ffffff;
     padding: 10px 0px;
     border-radius: 12px;
     margin: 0 auto;
@@ -72,11 +71,11 @@ onMounted(async () => {
     .amazon-keyword-extension {
         padding: 4px;
     }
-    
+
     .header h2 {
         font-size: 16px;
     }
-    
+
     .main-content {
         padding: 4px;
     }
@@ -86,7 +85,7 @@ onMounted(async () => {
     .amazon-keyword-extension {
         padding: 12px;
     }
-    
+
     .main-content {
         padding: 12px;
     }

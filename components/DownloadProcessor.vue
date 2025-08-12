@@ -10,8 +10,14 @@
             <!-- 第一行row -->
             <el-row :gutter="24" align="middle">
                 <el-col :span="9">
-                    <el-upload ref="uploadRef" :auto-upload="false" :show-file-list="false" accept=".xlsx,.xls,.csv"
-                        :before-upload="handleBeforeUpload" @change="handleFileChange">
+                    <el-upload
+                        ref="uploadRef"
+                        :auto-upload="false"
+                        :show-file-list="false"
+                        accept=".xlsx,.xls,.csv"
+                        :before-upload="handleBeforeUpload"
+                        @change="handleFileChange"
+                    >
                         <el-button plain type="primary">
                             <el-icon>
                                 <Upload />
@@ -24,8 +30,12 @@
                     <el-button @click="showKeywordDialog" type="primary" :icon="Edit" plain />
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="primary" @click="handleBatchSearch" :loading="store.batchSearching"
-                        :disabled="!store.hasKeywords">
+                    <el-button
+                        type="primary"
+                        @click="handleBatchSearch"
+                        :loading="store.batchSearching"
+                        :disabled="!store.hasKeywords"
+                    >
                         <el-icon>
                             <Search />
                         </el-icon>
@@ -33,7 +43,12 @@
                     </el-button>
                 </el-col>
                 <el-col :span="1">
-                    <el-button plain type="info" @click="handleDownloadResults" :disabled="!store.hasResults">
+                    <el-button
+                        plain
+                        type="info"
+                        @click="handleDownloadResults"
+                        :disabled="!store.hasResults"
+                    >
                         <el-icon>
                             <Download />
                         </el-icon>
@@ -49,7 +64,12 @@
                 <span class="preview-title">已导入关键词 ({{ store.keywords.length }}个)</span>
             </el-divider>
             <div class="keywords-list">
-                <el-tag v-for="(keyword, index) in displayKeywords" :key="index" size="small" class="keyword-tag">
+                <el-tag
+                    v-for="(keyword, index) in displayKeywords"
+                    :key="index"
+                    size="small"
+                    class="keyword-tag"
+                >
                     {{ keyword }}
                 </el-tag>
                 <el-tag v-if="store.keywords.length > 10" size="small" type="info">
@@ -59,12 +79,23 @@
             <el-divider content-position="left" />
         </div>
         <!-- 输入关键词对话框 -->
-        <el-dialog v-model="keywordDialogVisible" class="keyword-dialog" title="输入关键词" width="400px"
-            :before-close="handleDialogClose">
+        <el-dialog
+            v-model="keywordDialogVisible"
+            class="keyword-dialog"
+            title="输入关键词"
+            width="400px"
+            :before-close="handleDialogClose"
+        >
             <div class="keyword-input-section">
-                <el-input v-model="keywordInput" type="textarea" :rows="12"
+                <el-input
+                    v-model="keywordInput"
+                    type="textarea"
+                    :rows="12"
                     placeholder="输入关键词，每行一个：&#10;例如：&#10;wireless headphones&#10;bluetooth speaker&#10;phone case&#10;..."
-                    class="keyword-textarea" maxlength="10000" show-word-limit />
+                    class="keyword-textarea"
+                    maxlength="10000"
+                    show-word-limit
+                />
                 <div class="input-stats">
                     <span class="stats-text">
                         预计导入关键词：{{ previewKeywords.length }} 个
@@ -80,8 +111,12 @@
                         <span>关键词预览</span>
                     </el-divider>
                     <div class="preview-keywords">
-                        <el-tag v-for="(keyword, index) in previewKeywords.slice(0, 20)" :key="index" size="small"
-                            class="preview-tag">
+                        <el-tag
+                            v-for="(keyword, index) in previewKeywords.slice(0, 20)"
+                            :key="index"
+                            size="small"
+                            class="preview-tag"
+                        >
                             {{ keyword }}
                         </el-tag>
                         <el-tag v-if="previewKeywords.length > 20" size="small" type="info">
@@ -94,7 +129,11 @@
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="keywordDialogVisible = false">取消</el-button>
-                    <el-button type="primary" @click="handleKeywordSubmit" :disabled="previewKeywords.length === 0">
+                    <el-button
+                        type="primary"
+                        @click="handleKeywordSubmit"
+                        :disabled="previewKeywords.length === 0"
+                    >
                         导入关键词 ({{ previewKeywords.length }})
                     </el-button>
                 </span>
@@ -104,104 +143,101 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { Upload, Search, Download } from '@element-plus/icons-vue'
-import { useExtensionStore } from '@/stores/useExtensionStore'
-import { parseExcelFile, validateExcelFile, generateResultsExcel } from '@/utils/excelUtils'
-import { Edit } from '@element-plus/icons-vue'
-const store = useExtensionStore()
+import { computed } from "vue";
+import { ElMessage, ElMessageBox } from "element-plus";
+import { Upload, Search, Download } from "@element-plus/icons-vue";
+import { useExtensionStore } from "@/stores/useExtensionStore";
+import { parseExcelFile, validateExcelFile, generateResultsExcel } from "@/utils/excelUtils";
+import { Edit } from "@element-plus/icons-vue";
+const store = useExtensionStore();
 
 // 对话框相关状态
-const keywordDialogVisible = ref(false)
-const keywordInput = ref('')
+const keywordDialogVisible = ref(false);
+const keywordInput = ref("");
 
 // 计算属性-tag关键词展示list
 const displayKeywords = computed(() => {
-    return store.keywords.slice(0, 10)
-})
+    return store.keywords.slice(0, 10);
+});
 
 // 关键词预览
 const previewKeywords = computed(() => {
-    if (!keywordInput.value.trim()) return []
+    if (!keywordInput.value.trim()) return [];
 
     return keywordInput.value
-        .split('\n')
-        .map(line => line.trim())
-        .filter(line => line.length > 0)
-        .filter((keyword, index, array) => array.indexOf(keyword) === index) // 去重
-})
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0)
+        .filter((keyword, index, array) => array.indexOf(keyword) === index); // 去重
+});
 
 // 方法 检验excel文件
 const handleBeforeUpload = (file: File) => {
-    const validation = validateExcelFile(file)
+    const validation = validateExcelFile(file);
     if (!validation.valid) {
-        ElMessage.error(validation.message)
-        return false
+        ElMessage.error(validation.message);
+        return false;
     }
-    return true
-}
+    return true;
+};
 
 // 上传文件
 const handleFileChange = async (file: any) => {
     try {
-        store.setStatus('正在解析文件...', 'info')
+        store.setStatus("正在解析文件...", "info");
 
         // 解析得到xlsx关键词列表
-        const excelData = await parseExcelFile(file.raw)
+        const excelData = await parseExcelFile(file.raw);
 
         if (excelData.keywords.length === 0) {
-            ElMessage.error('未在文件中找到有效的关键词')
-            return
+            ElMessage.error("未在文件中找到有效的关键词");
+            return;
         }
 
-        store.setKeywords(excelData.keywords)
-        store.setStatus(`成功导入 ${excelData.keywords.length} 个关键词`, 'success')
-        ElMessage.success(`成功导入 ${excelData.keywords.length} 个关键词`)
-
+        store.setKeywords(excelData.keywords);
+        store.setStatus(`成功导入 ${excelData.keywords.length} 个关键词`, "success");
+        ElMessage.success(`成功导入 ${excelData.keywords.length} 个关键词`);
     } catch (error) {
-        console.error('文件解析错误:', error)
-        const errorMessage = error instanceof Error ? error.message : '文件解析失败'
-        store.setStatus(errorMessage, 'error')
-        ElMessage.error(errorMessage)
+        console.error("文件解析错误:", error);
+        const errorMessage = error instanceof Error ? error.message : "文件解析失败";
+        store.setStatus(errorMessage, "error");
+        ElMessage.error(errorMessage);
     }
-}
+};
 // 关键词输入对话框
 const showKeywordDialog = () => {
-    keywordDialogVisible.value = true
-    keywordInput.value = ''
-}
+    keywordDialogVisible.value = true;
+    keywordInput.value = "";
+};
 
 // 对话框处理
 const handleDialogClose = (done: () => void) => {
     if (keywordInput.value.trim()) {
-        ElMessageBox.confirm(
-            '您输入的关键词尚未保存，确定要关闭吗？',
-            '确认关闭',
-            {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning',
-            }
-        ).then(() => {
-            done()
-        }).catch(() => {
-            // 用户取消关闭
+        ElMessageBox.confirm("您输入的关键词尚未保存，确定要关闭吗？", "确认关闭", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
         })
+            .then(() => {
+                done();
+            })
+            .catch(() => {
+                // 用户取消关闭
+            });
     } else {
-        done()
+        done();
     }
-}
+};
 
 // 提交关键词
 const handleKeywordSubmit = () => {
     if (previewKeywords.value.length === 0) {
-        ElMessage.error('请输入至少一个关键词')
-        return
+        ElMessage.error("请输入至少一个关键词");
+        return;
     }
 
     if (previewKeywords.value.length > 100) {
-        ElMessage.warning('关键词数量较多，建议分批处理以确保搜索效率')
+        ElMessage.warning("关键词数量较多，建议分批处理以确保搜索效率");
     }
 
     // 如果已有关键词，询问是否替换
@@ -209,108 +245,112 @@ const handleKeywordSubmit = () => {
         // 之前上传的关键词
         ElMessageBox.confirm(
             `当前已有 ${store.keywords.length} 个关键词，是否要替换为新输入的 ${previewKeywords.value.length} 个关键词？`,
-            '确认替换',
+            "确认替换",
             {
-                confirmButtonText: '替换',
-                cancelButtonText: '追加',
+                confirmButtonText: "替换",
+                cancelButtonText: "追加",
                 distinguishCancelAndClose: true,
-                type: 'warning',
+                type: "warning",
             }
-        ).then(() => {
-            // 替换
-            store.setKeywords(previewKeywords.value)
-            ElMessage.success(`成功替换为 ${previewKeywords.value.length} 个关键词`)
-        }).catch((action) => {
-            if (action === 'cancel') {
-                // 追加
-                const newKeywords = [...store.keywords, ...previewKeywords.value]
-                const uniqueKeywords = [...new Set(newKeywords)] // 去重
-                store.setKeywords(uniqueKeywords)
-                ElMessage.success(`成功追加关键词，当前共 ${uniqueKeywords.length} 个关键词`)
-            }
-        }).finally(() => {
-            keywordDialogVisible.value = false
-            keywordInput.value = ''
-        })
+        )
+            .then(() => {
+                // 替换
+                store.setKeywords(previewKeywords.value);
+                ElMessage.success(`成功替换为 ${previewKeywords.value.length} 个关键词`);
+            })
+            .catch((action) => {
+                if (action === "cancel") {
+                    // 追加
+                    const newKeywords = [...store.keywords, ...previewKeywords.value];
+                    const uniqueKeywords = [...new Set(newKeywords)]; // 去重
+                    store.setKeywords(uniqueKeywords);
+                    ElMessage.success(`成功追加关键词，当前共 ${uniqueKeywords.length} 个关键词`);
+                }
+            })
+            .finally(() => {
+                keywordDialogVisible.value = false;
+                keywordInput.value = "";
+            });
     } else {
         // 直接设置
-        store.setKeywords(previewKeywords.value)
-        ElMessage.success(`成功导入 ${previewKeywords.value.length} 个关键词`)
-        keywordDialogVisible.value = false
-        keywordInput.value = ''
+        store.setKeywords(previewKeywords.value);
+        ElMessage.success(`成功导入 ${previewKeywords.value.length} 个关键词`);
+        keywordDialogVisible.value = false;
+        keywordInput.value = "";
     }
-}
+};
 
 const clearInput = () => {
-    ElMessageBox.confirm(
-        '确定要清空所有输入的关键词吗？',
-        '确认清空',
-        {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning',
-        }
-    ).then(() => {
-        keywordInput.value = ''
-    }).catch(() => {
-        // 用户取消
+    ElMessageBox.confirm("确定要清空所有输入的关键词吗？", "确认清空", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
     })
-}
+        .then(() => {
+            keywordInput.value = "";
+        })
+        .catch(() => {
+            // 用户取消
+        });
+};
 
 // 批量搜索
 const handleBatchSearch = async () => {
     if (!store.hasKeywords) {
-        ElMessage.error('请先上传关键词文件')
-        return
+        ElMessage.error("请先上传关键词文件");
+        return;
     }
 
     if (store.asins.length === 0) {
-        ElMessage.error('请先添加至少一个ASIN')
-        return
+        ElMessage.error("请先添加至少一个ASIN");
+        return;
     }
 
-    store.setBatchSearching(true)
-    store.setStatus('正在进行批量搜索...', 'info')
+    store.setBatchSearching(true);
+    store.setStatus("正在进行批量搜索...", "info");
 
     try {
         // 获取当前活动标签页
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+        const [tab] = await chrome.tabs.query({
+            active: true,
+            currentWindow: true,
+        });
 
         if (!tab.id) {
-            throw new Error('无法获取当前标签页')
+            throw new Error("无法获取当前标签页");
         }
 
         // 检查是否在亚马逊网站
-        if (!tab.url?.includes('amazon.')) {
-            ElMessage.error('请在亚马逊网站上使用此功能')
-            return
+        if (!tab.url?.includes("amazon.")) {
+            ElMessage.error("请在亚马逊网站上使用此功能");
+            return;
         }
 
         // 发送消息给content script 一次性消息
         const response = await chrome.tabs.sendMessage(tab.id, {
-            action: 'batchSearch',
+            action: "batchSearch",
             keywords: store.keywords,
             asins: store.asins,
-            maxPages: store.maxPages
-        })
+            maxPages: store.maxPages,
+        });
 
         if (response.success) {
-            store.setBatchResults(response.results)
-            store.setStatus(`批量搜索完成，找到 ${response.results.length} 个结果`, 'success')
-            ElMessage.success(`批量搜索完成，找到 ${response.results.length} 个结果`)
+            store.setBatchResults(response.results);
+            store.setStatus(`批量搜索完成，找到 ${response.results.length} 个结果`, "success");
+            ElMessage.success(`批量搜索完成，找到 ${response.results.length} 个结果`);
         } else {
-            store.setStatus(response.message || '批量搜索失败', 'error')
-            ElMessage.error(response.message || '批量搜索失败')
+            store.setStatus(response.message || "批量搜索失败", "error");
+            ElMessage.error(response.message || "批量搜索失败");
         }
     } catch (error) {
-        console.error('批量搜索错误:', error)
-        const errorMessage = error instanceof Error ? error.message : '批量搜索过程中发生错误'
-        store.setStatus(errorMessage, 'error')
-        ElMessage.error(errorMessage)
+        console.error("批量搜索错误:", error);
+        const errorMessage = error instanceof Error ? error.message : "批量搜索过程中发生错误";
+        store.setStatus(errorMessage, "error");
+        ElMessage.error(errorMessage);
     } finally {
-        store.setBatchSearching(false)
+        store.setBatchSearching(false);
     }
-}
+};
 
 // 下载搜索结果excel
 const handleDownloadResults = () => {
@@ -318,7 +358,6 @@ const handleDownloadResults = () => {
     //     ElMessage.error('没有可下载的结果')
     //     return
     //   }
-
     //   try {
     //     const success = generateResultsExcel(store.resultsTableData)
     //     if (success) {
@@ -330,7 +369,7 @@ const handleDownloadResults = () => {
     //     console.error('下载错误:', error)
     //     ElMessage.error('下载过程中发生错误')
     //   }
-}
+};
 </script>
 
 <style scoped>
@@ -340,7 +379,7 @@ const handleDownloadResults = () => {
 
 .card-header {
     font-size: 16px;
-    font-weight: bold
+    font-weight: bold;
 }
 
 .keywords-preview {

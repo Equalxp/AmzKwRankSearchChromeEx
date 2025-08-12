@@ -284,5 +284,4 @@ export default defineBackground(() => {
 
     // // 清理可能存在的旧连接
     // connectedPorts.clear()
-
 });

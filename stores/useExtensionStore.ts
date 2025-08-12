@@ -1,36 +1,36 @@
 // 核心状态管理
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { defineStore } from "pinia";
+import { ref, computed } from "vue";
 
 export interface SearchResult {
-    asin: string
-    keyword: string
-    page: number
-    position: number
-    isAd: boolean
+    asin: string;
+    keyword: string;
+    page: number;
+    position: number;
+    isAd: boolean;
 }
 
 // 单个搜索结果 待优化
 export interface SingleSearchResult {
-    found: boolean
-    page?: number
-    position?: number
-    isAd?: boolean
+    found: boolean;
+    page?: number;
+    position?: number;
+    isAd?: boolean;
 }
 
-export const useExtensionStore = defineStore('extension', () => {
+export const useExtensionStore = defineStore("extension", () => {
     // 状态数据
-    const asins = ref<string[]>([]) // asin数据
-    
-    const maxPages = ref(2) // 最大搜索页
-    const timeoutPeriod = ref(10) //超时时间
-    const keywords = ref<string[]>([]) // 关键词-数组
-    const results = ref<Record<string, SingleSearchResult>>({}) // 单个搜索结果
-    const batchSearching = ref(false) //批量搜索
-    const batchResults = ref<SearchResult[]>([]) // 批量搜索结果
-    const statusMessage = ref('') //状态message
-    const statusType = ref<'success' | 'warning' | 'error' | 'info'>('info') //状态类型
-    const singleKeyword = ref<string>() // 单个搜索关键词
+    const asins = ref<string[]>([]); // asin数据
+
+    const maxPages = ref(2); // 最大搜索页
+    const timeoutPeriod = ref(10); //超时时间
+    const keywords = ref<string[]>([]); // 关键词-数组
+    const results = ref<Record<string, SingleSearchResult>>({}); // 单个搜索结果
+    const batchSearching = ref(false); //批量搜索
+    const batchResults = ref<SearchResult[]>([]); // 批量搜索结果
+    const statusMessage = ref(""); //状态message
+    const statusType = ref<"success" | "warning" | "error" | "info">("info"); //状态类型
+    const singleKeyword = ref<string>(); // 单个搜索关键词
 
     // 优化
     const dataForm = reactive({
@@ -41,65 +41,64 @@ export const useExtensionStore = defineStore('extension', () => {
     });
 
     // 计算属性
-    const hasKeywords = computed(() => keywords.value.length > 0) // 关键词上传校验数值
-    const hasResults = computed(() => batchResults.value.length > 0) // 是否有结果
+    const hasKeywords = computed(() => keywords.value.length > 0); // 关键词上传校验数值
+    const hasResults = computed(() => batchResults.value.length > 0); // 是否有结果
 
     // tag删除asin
     const removeAsin = (index: number) => {
-        asins.value.splice(index, 1)
+        asins.value.splice(index, 1);
         // saveToStorage()
-    }
+    };
     // tag添加asin
     const addAsin = (asin: string) => {
         // 重复&数量校验
         if (!asins.value.includes(asin) && asins.value.length < 3) {
-            asins.value.push(asin)
+            asins.value.push(asin);
             // saveToStorage()
-            return true
+            return true;
         }
-        return false
-    }
+        return false;
+    };
 
     // 设置最大搜索页
     const setMaxPages = (pages: number) => {
-        dataForm.maxPages = pages
+        dataForm.maxPages = pages;
         // saveToStorage()
-    }
+    };
 
     // 设置超时时间
     const setTimeoutPeriod = (period: number) => {
-        dataForm.timeoutPeriod = period
+        dataForm.timeoutPeriod = period;
         // saveToStorage()
-    }
+    };
 
     // 清除缓存
     const clearStorage = async () => {
-        await chrome.storage.local.clear()
-    }
+        await chrome.storage.local.clear();
+    };
 
     // 设置批量搜索
     const setBatchSearching = (value: boolean) => {
-        batchSearching.value = value
-    }
+        batchSearching.value = value;
+    };
 
     // message状态设置
-    const setStatus = (message: string, type: 'success' | 'warning' | 'error' | 'info' = 'info') => {
-        statusMessage.value = message
-        statusType.value = type
-    }
+    const setStatus = (message: string, type: "success" | "warning" | "error" | "info" = "info") => {
+        statusMessage.value = message;
+        statusType.value = type;
+    };
 
-    // 
+    //
     const setBatchResults = (newBatchResults: SearchResult[]) => {
-        dataForm.batchResults = newBatchResults
+        dataForm.batchResults = newBatchResults;
         // saveToStorage()
-    }
+    };
 
     // 关键词设置
     const setKeywords = (newKeywords: string[]) => {
-        dataForm.keywords = newKeywords
+        dataForm.keywords = newKeywords;
         // saveToStorage()
-    }
-
+    };
 
     // 存储管理
     const saveToStorage = async () => {
@@ -110,12 +109,12 @@ export const useExtensionStore = defineStore('extension', () => {
                 timeoutPeriod: timeoutPeriod.value,
                 keywords: keywords.value,
                 results: results.value, // 单个搜索结果
-                batchResults: batchResults.value // 批量搜索结果
-            })
+                batchResults: batchResults.value, // 批量搜索结果
+            });
         } catch (error) {
-            console.error('保存到存储失败:', error)
+            console.error("保存到存储失败:", error);
         }
-    }
+    };
 
     return {
         // 状态
@@ -141,5 +140,5 @@ export const useExtensionStore = defineStore('extension', () => {
         setBatchSearching,
         setStatus,
         setKeywords,
-    }
-})
+    };
+});
