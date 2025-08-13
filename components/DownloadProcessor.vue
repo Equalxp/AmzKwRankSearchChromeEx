@@ -27,7 +27,12 @@
                     </el-upload>
                 </el-col>
                 <el-col :span="3">
-                    <el-button @click="showKeywordDialog" type="primary" :icon="Edit" plain />
+                    <el-button
+                        @click="showKeywordDialog"
+                        type="primary"
+                        :icon="Edit"
+                        plain
+                    />
                 </el-col>
                 <el-col :span="6">
                     <el-button
@@ -61,7 +66,9 @@
         <!-- 关键词预览 -->
         <div v-if="store.keywords.length > 0" class="keywords-preview">
             <el-divider content-position="left">
-                <span class="preview-title">已导入关键词 ({{ store.keywords.length }}个)</span>
+                <span class="preview-title"
+                    >已导入关键词 ({{ store.keywords.length }}个)</span
+                >
             </el-divider>
             <div class="keywords-list">
                 <el-tag
@@ -72,7 +79,11 @@
                 >
                     {{ keyword }}
                 </el-tag>
-                <el-tag v-if="store.keywords.length > 10" size="small" type="info">
+                <el-tag
+                    v-if="store.keywords.length > 10"
+                    size="small"
+                    type="info"
+                >
                     ...还有{{ store.keywords.length - 10 }}个
                 </el-tag>
             </div>
@@ -95,12 +106,17 @@
                     class="keyword-textarea"
                     maxlength="10000"
                     show-word-limit
-                />
+                ></el-input>
                 <div class="input-stats">
                     <span class="stats-text">
                         预计导入关键词：{{ previewKeywords.length }} 个
                     </span>
-                    <el-button v-if="keywordInput.trim()" link size="small" @click="clearInput">
+                    <el-button
+                        v-if="keywordInput.trim()"
+                        link
+                        size="small"
+                        @click="clearInput"
+                    >
                         清空
                     </el-button>
                 </div>
@@ -112,14 +128,21 @@
                     </el-divider>
                     <div class="preview-keywords">
                         <el-tag
-                            v-for="(keyword, index) in previewKeywords.slice(0, 20)"
+                            v-for="(keyword, index) in previewKeywords.slice(
+                                0,
+                                20
+                            )"
                             :key="index"
                             size="small"
                             class="preview-tag"
                         >
                             {{ keyword }}
                         </el-tag>
-                        <el-tag v-if="previewKeywords.length > 20" size="small" type="info">
+                        <el-tag
+                            v-if="previewKeywords.length > 20"
+                            size="small"
+                            type="info"
+                        >
                             ...还有{{ previewKeywords.length - 20 }}个
                         </el-tag>
                     </div>
@@ -128,7 +151,9 @@
 
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="keywordDialogVisible = false">取消</el-button>
+                    <el-button @click="keywordDialogVisible = false"
+                        >取消</el-button
+                    >
                     <el-button
                         type="primary"
                         @click="handleKeywordSubmit"
@@ -147,7 +172,11 @@ import { computed } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { Upload, Search, Download } from "@element-plus/icons-vue";
 import { useExtensionStore } from "@/stores/useExtensionStore";
-import { parseExcelFile, validateExcelFile, generateResultsExcel } from "@/utils/excelUtils";
+import {
+    parseExcelFile,
+    validateExcelFile,
+    generateResultsExcel,
+} from "@/utils/excelUtils";
 import { Edit } from "@element-plus/icons-vue";
 const store = useExtensionStore();
 
@@ -195,11 +224,15 @@ const handleFileChange = async (file: any) => {
         }
 
         store.setKeywords(excelData.keywords);
-        store.setStatus(`成功导入 ${excelData.keywords.length} 个关键词`, "success");
+        store.setStatus(
+            `成功导入 ${excelData.keywords.length} 个关键词`,
+            "success"
+        );
         ElMessage.success(`成功导入 ${excelData.keywords.length} 个关键词`);
     } catch (error) {
         console.error("文件解析错误:", error);
-        const errorMessage = error instanceof Error ? error.message : "文件解析失败";
+        const errorMessage =
+            error instanceof Error ? error.message : "文件解析失败";
         store.setStatus(errorMessage, "error");
         ElMessage.error(errorMessage);
     }
@@ -213,11 +246,15 @@ const showKeywordDialog = () => {
 // 对话框处理
 const handleDialogClose = (done: () => void) => {
     if (keywordInput.value.trim()) {
-        ElMessageBox.confirm("您输入的关键词尚未保存，确定要关闭吗？", "确认关闭", {
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
-            type: "warning",
-        })
+        ElMessageBox.confirm(
+            "您输入的关键词尚未保存，确定要关闭吗？",
+            "确认关闭",
+            {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                type: "warning",
+            }
+        )
             .then(() => {
                 done();
             })
@@ -256,15 +293,22 @@ const handleKeywordSubmit = () => {
             .then(() => {
                 // 替换
                 store.setKeywords(previewKeywords.value);
-                ElMessage.success(`成功替换为 ${previewKeywords.value.length} 个关键词`);
+                ElMessage.success(
+                    `成功替换为 ${previewKeywords.value.length} 个关键词`
+                );
             })
             .catch((action) => {
                 if (action === "cancel") {
                     // 追加
-                    const newKeywords = [...store.keywords, ...previewKeywords.value];
+                    const newKeywords = [
+                        ...store.keywords,
+                        ...previewKeywords.value,
+                    ];
                     const uniqueKeywords = [...new Set(newKeywords)]; // 去重
                     store.setKeywords(uniqueKeywords);
-                    ElMessage.success(`成功追加关键词，当前共 ${uniqueKeywords.length} 个关键词`);
+                    ElMessage.success(
+                        `成功追加关键词，当前共 ${uniqueKeywords.length} 个关键词`
+                    );
                 }
             })
             .finally(() => {
@@ -336,15 +380,21 @@ const handleBatchSearch = async () => {
 
         if (response.success) {
             store.setBatchResults(response.results);
-            store.setStatus(`批量搜索完成，找到 ${response.results.length} 个结果`, "success");
-            ElMessage.success(`批量搜索完成，找到 ${response.results.length} 个结果`);
+            store.setStatus(
+                `批量搜索完成，找到 ${response.results.length} 个结果`,
+                "success"
+            );
+            ElMessage.success(
+                `批量搜索完成，找到 ${response.results.length} 个结果`
+            );
         } else {
             store.setStatus(response.message || "批量搜索失败", "error");
             ElMessage.error(response.message || "批量搜索失败");
         }
     } catch (error) {
         console.error("批量搜索错误:", error);
-        const errorMessage = error instanceof Error ? error.message : "批量搜索过程中发生错误";
+        const errorMessage =
+            error instanceof Error ? error.message : "批量搜索过程中发生错误";
         store.setStatus(errorMessage, "error");
         ElMessage.error(errorMessage);
     } finally {

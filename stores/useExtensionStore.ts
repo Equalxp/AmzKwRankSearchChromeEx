@@ -41,7 +41,7 @@ export const useExtensionStore = defineStore("extension", () => {
     });
 
     // 计算属性
-    const hasKeywords = computed(() => keywords.value.length > 0); // 关键词上传校验数值
+    const hasKeywords = computed(() => dataForm.keywords.length > 0); // 关键词上传校验数值
     const hasResults = computed(() => batchResults.value.length > 0); // 是否有结果
 
     // tag删除asin
@@ -127,6 +127,7 @@ export const useExtensionStore = defineStore("extension", () => {
         statusMessage,
         statusType,
         singleKeyword,
+        dataForm,
         // 计算属性
         hasKeywords,
         hasResults,

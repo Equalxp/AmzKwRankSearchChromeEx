@@ -3,9 +3,7 @@
         <template #header>
             <div class="card-header">
                 <span>ASIN管理</span>
-                <el-tag class="asin-tag-info" type="info" size="default"
-                    >最多3个</el-tag
-                >
+                <el-tag class="asin-tag-info" type="info" size="default">最多3个</el-tag>
             </div>
         </template>
 
