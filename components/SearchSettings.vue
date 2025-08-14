@@ -124,7 +124,12 @@
 import { ElMessage, ElMessageBox } from "element-plus";
 import { Search, Delete } from "@element-plus/icons-vue";
 import { useExtensionStore } from "@/stores/useExtensionStore";
-import { parseExcelFile, validateExcelFile, generateResultsExcel } from "@/utils/excelUtils";
+import {
+    parseExcelFile,
+    validateExcelFile,
+    generateResultsExcel,
+    handleKeywordInput,
+} from "@/utils/excelUtils";
 
 // 变量
 const store = useExtensionStore();
@@ -145,8 +150,9 @@ const previewKeywords = computed(() => {
 // Input框输入
 const handleInputChange = () => {
     displayKeyword.value = true;
-    console.log('arr arr ', previewKeywords);
+    console.log("arr arr ", previewKeywords);
     // 如果store中已经有值
+    handleKeywordInput(previewKeywords.value, "manual");
 };
 
 // 上传之前文件校验
@@ -175,7 +181,8 @@ const handleFileChange = async (file: any) => {
         }
 
         // 关键词写入store.keywords
-        store.setKeywords(excelData.keywords);
+        // store.setKeywords(excelData.keywords);
+        handleKeywordInput(excelData.keywords, "upload");
         store.setStatus(`成功导入 ${excelData.keywords.length} 个关键词`, "success");
         ElMessage.success(`成功导入 ${excelData.keywords.length} 个关键词`);
         // 处理完成后删除，避免重复处理

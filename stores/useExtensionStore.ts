@@ -31,6 +31,7 @@ export const useExtensionStore = defineStore("extension", () => {
     const statusMessage = ref(""); //状态message
     const statusType = ref<"success" | "warning" | "error" | "info">("info"); //状态类型
     const singleKeyword = ref<string>(); // 单个搜索关键词
+    const lastInputType = ref<'manual' | 'upload' | null>(null) // 上传方式
 
     // 优化
     const dataForm = reactive({
@@ -100,6 +101,19 @@ export const useExtensionStore = defineStore("extension", () => {
         // saveToStorage()
     };
 
+    // 关键词设置
+    const setKeywordsNew = (newKeywords: string[], type: 'manual' | 'upload') => {
+        dataForm.keywords = [...new Set(newKeywords)]
+        lastInputType.value = type
+    }
+
+    // 关键词追加
+    const appendKeywords = (newKeywords: string[], type: 'manual' | 'upload') => {
+        dataForm.keywords = [...new Set([...keywords.value, ...newKeywords])]
+        lastInputType.value = type
+    }
+
+
     // 存储管理
     const saveToStorage = async () => {
         try {
@@ -128,6 +142,7 @@ export const useExtensionStore = defineStore("extension", () => {
         statusType,
         singleKeyword,
         dataForm,
+        lastInputType,
         // 计算属性
         hasKeywords,
         hasResults,
@@ -141,5 +156,7 @@ export const useExtensionStore = defineStore("extension", () => {
         setBatchSearching,
         setStatus,
         setKeywords,
+        appendKeywords,
+        setKeywordsNew,
     };
 });

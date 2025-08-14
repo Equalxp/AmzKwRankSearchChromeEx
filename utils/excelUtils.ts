@@ -1,6 +1,6 @@
 // 处理Excel文件的导入和导出功能
 import * as XLSX from "xlsx";
-
+import { useExtensionStore } from '@/stores/useExtensionStore'
 // 表头-列 数据
 export interface ExcelData {
     keywords: string[];
@@ -223,4 +223,19 @@ export function validateExcelFile(file: File): {
         valid: true,
         message: "文件格式有效",
     };
+}
+
+// keywords覆盖函数
+export const handleKeywordInput = (newKeywords: string[], type: 'manual' | 'upload') => {
+    const store = useExtensionStore()
+
+    if (store.lastInputType && store.lastInputType !== type) {
+        // 不同来源 → 覆盖
+        store.setKeywordsNew(newKeywords, type)
+    } else {
+        // 相同来源 → 追加（或者你可以改成覆盖）
+        store.appendKeywords(newKeywords, type)
+        console.log('09099909');
+
+    }
 }
